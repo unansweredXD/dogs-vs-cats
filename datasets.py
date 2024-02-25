@@ -26,7 +26,8 @@ class ImageDirsDataset(Dataset):
         else:
             self.preprocessing = None
 
-    def load_label(self, filename: str):
+    @staticmethod
+    def load_label(filename: str):
         return 0 if filename[:3] == "dog" else 1
 
     def __len__(self):
