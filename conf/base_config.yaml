@@ -1,0 +1,9 @@
+dataset:
+    train_path: ./train
+    val_path: ./val
+    test_path: ./test
+    train_preprocessing_config: ./conf/train_preprocessing.yaml
+    val_preprocessing_config: ./conf/val_preprocessing.yaml
+    loader_num_workers: 2
+    train_size: 0.6
+    batch_size: 128

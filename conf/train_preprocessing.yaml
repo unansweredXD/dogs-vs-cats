@@ -1,0 +1,56 @@
+transform:
+  __class_fullname__: Compose
+  p: 1.0
+  transforms:
+  - __class_fullname__: VerticalFlip
+    always_apply: false
+    p: 0.5
+  - __class_fullname__: HorizontalFlip
+    always_apply: false
+    p: 0.5
+  - __class_fullname__: Rotate
+    always_apply: false
+    border_mode: 4
+    interpolation: 1
+    limit:
+    - -360
+    - 360
+    p: 0.5
+    value: null
+  - __class_fullname__: CLAHE
+    always_apply: false
+    clip_limit:
+    - 1
+    - 4.0
+    p: 0.8
+    tile_grid_size:
+    - 8
+    - 8
+  - __class_fullname__: RandomBrightnessContrast
+    always_apply: false
+    brightness_by_max: true
+    brightness_limit:
+    - -0.2
+    - 0.2
+    contrast_limit:
+    - -0.2
+    - 0.2
+    p: 0.8
+  - __class_fullname__: RandomGamma
+    always_apply: false
+    eps: null
+    gamma_limit:
+    - 80
+    - 120
+    p: 0.8
+  - __class_fullname__: Resize
+    always_apply: false
+    height: 224
+    width: 224
+    interpolation: 1
+    p: 1
+  - __class_fullname__: Normalize
+    always_apply: false
+    max_pixel_value: 255.0
+    mean: 0
+    std: 1
