@@ -1,11 +1,10 @@
-# Нужные библиотеки
 from collections import defaultdict
 
 
-# Класс для отслеживания метрик при обучении модели
 class MetricMonitor:
     def __init__(self, float_precision=3):
         self.float_precision = float_precision
+        self.metrics = None
         self.reset()
 
     def reset(self):

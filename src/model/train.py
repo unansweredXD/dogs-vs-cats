@@ -7,7 +7,6 @@ from src.metrics.accuracy_metrics import calculate_accuracy, model_f1_score
 from src.metrics.metrics_monitor import MetricMonitor
 
 
-# Класс для обучения
 class ModelTrainer(nn.Module):
     def __init__(self, device, train_loader, val_loader, model, criterion, optimizer, epoch, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -46,13 +45,10 @@ class ModelTrainer(nn.Module):
                 "Epoch: {epoch}.  Train.      {metric_monitor}".format(epoch=epoch, metric_monitor=metric_monitor)
             )
 
-        # Сохранение результатов
         wandb.log({"accuracy": metric_monitor.metrics['Accuracy']['avg'],
                    "loss": metric_monitor.metrics['Loss']['avg'],
                    "F1-score": metric_monitor.metrics['F1-score']['avg']})
-        val_accuracy = None
-        val_loss = None
-        val_f1 = None
+
         self.model.eval()
         stream = tqdm(self.val_loader)
 
@@ -71,7 +67,6 @@ class ModelTrainer(nn.Module):
                     "Epoch: {epoch}.  Validation. {metric_monitor}".format(epoch=epoch, metric_monitor=metric_monitor)
                 )
 
-        # Сохранение результатов
         wandb.log({"val_accuracy": metric_monitor.metrics['Accuracy']['avg'],
                    "val_loss": metric_monitor.metrics['Loss']['avg'],
                    "val_F1-score": metric_monitor.metrics['F1-score']['avg']})
