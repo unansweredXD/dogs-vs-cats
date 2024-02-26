@@ -21,7 +21,7 @@ from src.metrics.wandb_metric import init_wandb
 from src.model.model import CNN
 from src.model.train import ModelTrainer
 
-EPOCH = 15
+EPOCH = 10
 LEARNING_RATE = 1e-3
 BATCH_SIZE = 64
 SEED = 42
@@ -44,7 +44,7 @@ def display_image_grid(images_filepaths, predicted_labels=None, rows=2, cols=5, 
     for idx in random_idx:
         image = cv2.imread(images_filepaths[idx])
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        true_label = images_filepaths[idx].split(os.sep)[-1].split('.')[0]
+        true_label = images_filepaths[idx].split(os.sep)[-1].split('_')[0]
         if predicted_labels is not None:
             class_ = predicted_labels[idx] 
             color = "green" if true_label == class_ else "red"
@@ -120,6 +120,9 @@ def main():
 
     loader = DatasetLoader()
     loader.extract_dataset()
+
+    if not os.path.isdir('dataset/data'):
+        loader.generate_dataset()
 
     seed_everything(SEED)
 
