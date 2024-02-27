@@ -4,7 +4,6 @@ import random
 import cv2
 import numpy as np
 import pandas as pd
-from PIL import Image
 from matplotlib import pyplot as plt
 from torch import nn
 
@@ -37,7 +36,7 @@ class Dataset(nn.Module):
         elif label == 'cat':
             label = 0
 
-        img = self.transform(image=img)["image"]
+        img = self.transform(image=img)['image']
 
         return img, label
 
@@ -49,23 +48,17 @@ class Dataset(nn.Module):
         for idx in random_idx:
             image = cv2.imread(self.file_list[idx])
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            true_label = self.file_list[idx].split(os.sep)[-1].split('_')[0]
+            correct_label = self.file_list[idx].split(os.sep)[-1].split('_')[0]
             if predicted_labels.empty:
-                class_ = true_label
-                color = "green"
+                image_class = correct_label
+                color = 'green'
             else:
-                class_ = predicted_labels.loc[predicted_labels['id'] == true_label, 'class'].values[0]
-                color = "red"
+                image_class = predicted_labels.loc[predicted_labels['id'] == correct_label, 'class'].values[0]
+                color = 'red'
             ax.ravel()[i].imshow(image)
-            ax.ravel()[i].set_title(class_, color=color)
+            ax.ravel()[i].set_title(image_class, color=color)
             ax.ravel()[i].set_axis_off()
             i += 1
 
         plt.tight_layout()
         plt.show()
-
-    def to_array(self):
-        return np.array(self.images, np.float32)
-
-    def transform_images(self, augmentation):
-        pass

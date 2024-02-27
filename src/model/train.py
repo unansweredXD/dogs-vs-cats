@@ -3,7 +3,6 @@ import wandb
 from torch import nn
 from tqdm import tqdm
 
-from src.metrics.accuracy_metrics import calculate_accuracy, model_f1_score
 from src.metrics.metrics_monitor import MetricMonitor
 
 
@@ -19,59 +18,62 @@ class ModelTrainer(nn.Module):
         self.epoch = epoch
 
     def train_model(self, epoch):
-        accuracy = None
-        loss = None
-        f1 = None
-
         metric_monitor = MetricMonitor()
         self.model.train()
         stream = tqdm(self.train_loader)
 
         for i, (images, target) in enumerate(stream, start=1):
-            images = images.to(self.device, non_blocking=True)
-            target = target.to(self.device, non_blocking=True)
-            output = self.model(images)
-            loss = self.criterion(output, target)
-            accuracy = calculate_accuracy(output, target)
-            f1 = model_f1_score(output, target)
+            metrics = self.get_metrics(images, target, metric_monitor)
 
-            metric_monitor.update("Accuracy", accuracy)
-            metric_monitor.update("Loss", loss.item())
-            metric_monitor.update("F1-score", f1)
             self.optimizer.zero_grad()
-            loss.backward()
+            metrics['loss'].backward()
             self.optimizer.step()
-            stream.set_description(
-                "Epoch: {epoch}.  Train.      {metric_monitor}".format(epoch=epoch, metric_monitor=metric_monitor)
-            )
+            stream.set_description(f'Epoch: {epoch}.\tTrain.\t {metric_monitor}')
 
-        wandb.log({"accuracy": metric_monitor.metrics['Accuracy']['avg'],
-                   "loss": metric_monitor.metrics['Loss']['avg'],
-                   "F1-score": metric_monitor.metrics['F1-score']['avg']})
+        wandb.log(
+            {
+                'train_accuracy': metric_monitor.metrics['Accuracy']['avg'],
+                'train_loss': metric_monitor.metrics['Loss']['avg'],
+                'train_F1-score': metric_monitor.metrics['F1-score']['avg']
+            }
+        )
 
         self.model.eval()
         stream = tqdm(self.val_loader)
 
         with torch.no_grad():
             for i, (images, target) in enumerate(stream, start=1):
-                images = images.to(self.device, non_blocking=True)
-                target = target.to(self.device, non_blocking=True)
-                output = self.model(images)
-                val_loss = self.criterion(output, target)
-                val_accuracy = calculate_accuracy(output, target)
-                val_f1 = model_f1_score(output, target)
-                metric_monitor.update("Accuracy", val_accuracy)
-                metric_monitor.update("Loss", val_loss.item())
-                metric_monitor.update("F1-score", val_f1)
-                stream.set_description(
-                    "Epoch: {epoch}.  Validation. {metric_monitor}".format(epoch=epoch, metric_monitor=metric_monitor)
-                )
+                metrics = self.get_metrics(images, target, metric_monitor)
 
-        wandb.log({"val_accuracy": metric_monitor.metrics['Accuracy']['avg'],
-                   "val_loss": metric_monitor.metrics['Loss']['avg'],
-                   "val_F1-score": metric_monitor.metrics['F1-score']['avg']})
+                stream.set_description(f'Epoch: {epoch}.\tValidation.\t {metric_monitor}')
+
+        wandb.log(
+            {
+                'validation_accuracy': metric_monitor.metrics['Accuracy']['avg'],
+                'validation_loss': metric_monitor.metrics['Loss']['avg'],
+                'validation_F1-score': metric_monitor.metrics['F1-score']['avg']
+            }
+        )
+
+    def get_metrics(self, images, target, monitor):
+        images = images.to(self.device, non_blocking=True)
+        target = target.to(self.device, non_blocking=True)
+        output = self.model(images)
+        accuracy = MetricMonitor.calculate_accuracy(output, target)
+        loss = self.criterion(output, target)
+        f1 = MetricMonitor.model_f1_score(output, target)
+
+        monitor.update('Accuracy', accuracy)
+        monitor.update('Loss', loss.item())
+        monitor.update('F1-score', f1)
+
+        return {
+            'loss': loss,
+            'accuracy': accuracy,
+            'f1': f1
+        }
 
     def start_training(self):
-        for epoch in range(1, self.epoch + 1):
-            self.train_model(epoch)
-            torch.save(self.model.state_dict(), "model.pt")
+        for epoch in range(self.epoch):
+            self.train_model(epoch + 1)
+            torch.save(self.model.state_dict(), 'model.pt')
