@@ -66,7 +66,7 @@ class Visualizer:
         prob = list(map(lambda x: x[1], predicted_labels))
         submission = pd.DataFrame({'id': idx, 'label': prob})
 
-        preds = pd.DataFrame(columns=['id', 'class'])
+        predictions = pd.DataFrame(columns=['id', 'class'])
 
         for i in range(len(submission)):
             label = submission.label[i]
@@ -74,4 +74,4 @@ class Visualizer:
                 label = 'dog'
             else:
                 label = 'cat'
-            preds.loc[len(preds.index)] = [submission.id[i], label]
+            predictions.loc[len(predictions.index)] = [submission.id[i], label]

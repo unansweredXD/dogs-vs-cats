@@ -2,11 +2,11 @@ from torch import nn
 
 
 class ConvBlock(nn.Module):
-    def __init__(self, chin, chout, kernel_size=3):
+    def __init__(self, chin, channel_out, kernel_size=3):
         super().__init__()
         self.seq = nn.Sequential(
-            nn.Conv2d(in_channels=chin, out_channels=chout, kernel_size=kernel_size, padding=0, stride=2),
-            nn.BatchNorm2d(chout),
+            nn.Conv2d(in_channels=chin, out_channels=channel_out, kernel_size=kernel_size, padding=0, stride=2),
+            nn.BatchNorm2d(channel_out),
             nn.ReLU(),
             nn.MaxPool2d(2)
         )
