@@ -34,9 +34,9 @@ class MetricMonitor:
         return acc
 
     @staticmethod
-    def model_f1_score(y, y_pred):
-        return f1_score(y.cpu().data.max(1)[1], y_pred.cpu())
+    def model_f1_score(y, y_prediction):
+        return f1_score(y.cpu().data.max(1)[1], y_prediction.cpu())
 
     @staticmethod
-    def model_matrix(y, y_pred):
-        return confusion_matrix(y.data.max(1)[1], y_pred.cpu())
+    def model_matrix(y, y_prediction):
+        return confusion_matrix(y.data.max(1)[1], y_prediction.cpu())
